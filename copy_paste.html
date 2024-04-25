@@ -209,7 +209,6 @@
                 
                 &:nth-of-type(odd) {
 		            background: rgb(72, 72, 72);
-                    border: 1px solid white;
 	            }
             }
             td {
@@ -224,30 +223,21 @@
                 background-color: black;
                 width: 65%;
                 padding: 5px;
-                border: 2px;
-                border-style: solid;
                 
             }
             .label1 {
                 color: white;
+                border-bottom: 3px solid white;
+                border-top: 3px solid white;
                 background-color: black;
-                border:3px solid white;
-                font-size: 20px;
+                font-size: 40px;
                 font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
                 width: 48%;
-                float: left;
-                padding: 5px;
+                align-items: center;
+                padding: 10px;
+                display: inline-block;
             }
-            .label2 {
-                color: white;
-                background-color: black;
-                border:3px solid white;
-                font-size: 20px;
-                font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-                width: 48%;
-                float: right;
-                padding: 5px;
-            }
+            
             .button-24 {
             background: rgb(35, 16, 208);
             border: 1px solid rgb(0, 0, 0);
@@ -308,12 +298,12 @@
             <form style="padding: 10px" name="predictionForm" onsubmit="predictor(); return false">
                 <div class="label1">
                     <label for="teamOne">Team #1:</label>
-                    <select name="teamOne" id="team1" style="color: black; font-size: 20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
+                    <select name="teamOne" id="team1" style="color: black; font-size: 30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
                     </select>
                 </div>
-                <div class="label2">
+                <div class="label1">
                     <label for="teamTwo">Team #2:</label>
-                    <select name="teamTwo" id="team2" style="color: black; font-size: 20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
+                    <select name="teamTwo" id="team2" style="color: black; font-size: 30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
                     </select>
                 </div>
                 <br>
