@@ -1,0 +1,347 @@
+<html>
+    <title>Match Predictor</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script>
+            function loadData() {
+
+                const populateOne = document.getElementById('team1')
+                const populateTwo = document.getElementById('team2')
+                const url = 'https://api.sheety.co/203dfa2c0b72a042e661770ec32fdffd/newRanks/epl'
+                fetch(url)
+                .then((res) => res.json())
+                .then(res => {
+                    console.log(res)
+                    const element = document.getElementById("teamInfo");
+                    if (element) {
+                        element.remove();
+                    }
+
+                    var table = document.createElement('table');
+                    table.setAttribute('id', 'teamInfo')
+
+                    var tableRow = document.createElement('tr');
+
+                    var tableHeading1 = document.createElement('th');
+                    tableHeading1.innerHTML = "Team"
+                    tableRow.appendChild(tableHeading1)
+
+                    var tableHeading2 = document.createElement('th');
+                    tableHeading2.innerHTML = "Rank"
+                    tableRow.appendChild(tableHeading2)
+
+                    var tableHeading3 = document.createElement('th');
+                    tableHeading3.innerHTML = "Wins"
+                    tableRow.appendChild(tableHeading3)
+
+                    var tableHeading4 = document.createElement('th');
+                    tableHeading4.innerHTML = "Losses"
+                    tableRow.appendChild(tableHeading4)
+
+                    var tableHeading5 = document.createElement('th');
+                    tableHeading5.innerHTML = "Ties"
+                    tableRow.appendChild(tableHeading5)
+
+                    var tableHeading6 = document.createElement('th');
+                    tableHeading6.innerHTML = "Points"
+                    tableRow.appendChild(tableHeading6)
+
+                    table.appendChild(tableRow)
+                    document.body.appendChild(table)
+
+                    for (i = 0; i < res.epl.length; i++) {
+
+                    const dataSet = res.epl[i]
+
+                    const team = document.createElement('option')
+                    team.value = dataSet.rank;
+                    team.innerHTML = dataSet.team;
+                    populateOne.appendChild(team);
+
+                    const team2 = document.createElement('option')
+                    team2.value = dataSet.rank;
+                    team2.innerHTML = dataSet.team;
+                    populateTwo.appendChild(team2);
+                    
+
+                    var teamDataRow = document.createElement('tr');
+                    var name = document.createElement('td');
+                    var rank = document.createElement('td');
+                    var wins = document.createElement('td');
+                    var losses = document.createElement('td');
+                    var ties = document.createElement('td');
+                    var points = document.createElement('td');
+
+                    name.innerHTML = dataSet.team;
+                    rank.innerHTML = dataSet.rank.toFixed(3);
+                    wins.innerHTML = dataSet.wins;
+                    losses.innerHTML = dataSet.losses;
+                    ties.innerHTML = dataSet.ties;
+                    points.innerHTML = dataSet.points;
+
+                    teamDataRow.appendChild(name);
+                    teamDataRow.appendChild(rank);
+                    teamDataRow.appendChild(wins);
+                    teamDataRow.appendChild(losses);
+                    teamDataRow.appendChild(ties);
+                    teamDataRow.appendChild(points);
+
+                    table.appendChild(teamDataRow);
+                }
+
+                })
+                }
+
+            function predictor() {
+
+                const element = document.getElementById("pictures");
+                    if (element) {
+                        element.remove();
+                    }
+
+                const team1 = document.predictionForm.team1.value;
+                const team2 = document.predictionForm.team2.value;
+
+                const teamName1 = getTeamName("team1", team1)
+                const teamName2 = getTeamName("team2", team2)
+
+                if (team1 == team2) {
+                alert("You cannot choose the same team!")
+                }
+
+                else {
+                
+                const theta = 1.85;
+                const theta2 = 2.4225;
+                const winChance1 = (Number(team1) / (Number(team1) + (Number(team2)*Number(theta))))*(100);
+                const winChance2 = (Number(team2) / (Number(team2) + (Number(team1)*Number(theta))))*(100);
+                const tie = ((Number(team1)*Number(team2)*(Number(theta2))) / ((Number(team1) + (Number(theta)* Number(team2))) * (Number(team2) + (Number(theta)* Number(team1)))))*(100);
+                console.log(tie)
+
+                if (winChance1 > winChance2) {
+                    document.getElementById("Winner").innerHTML = (teamName1);
+                    document.getElementById("Loser").innerHTML = (teamName2);
+                    document.getElementById("Draw").innerHTML = ("Draw");
+                    
+                    const green = document.getElementById('green');
+                    green.style.width = winChance1 + "%"
+                    green.innerHTML = winChance1.toFixed(2)+"%";
+
+                    const yellow = document.getElementById('yellow');
+                    yellow.style.width = tie + "%";
+                    yellow.innerHTML = tie.toFixed(2)+"%";
+
+                    const loss = 100 - (Number(winChance1)+Number(tie));
+
+                    const red = document.getElementById('red');
+                    red.style.width = loss + "%";
+                    red.innerHTML = loss.toFixed(2)+"%";
+
+                }
+                else {
+                    document.getElementById("Winner").innerHTML = (teamName2);
+                    document.getElementById("Loser").innerHTML = (teamName1);
+                    document.getElementById("Draw").innerHTML = ("Draw");
+                    
+                    const green = document.getElementById('green');
+                    green.style.width = winChance2 + "%";
+                    green.innerHTML = winChance2.toFixed(2)+"%";
+
+                    const yellow = document.getElementById('yellow');
+                    yellow.style.width = tie + "%";
+                    yellow.innerHTML = tie.toFixed(2)+"%";
+
+                    const loss = 100 - (Number(winChance2)+Number(tie));
+
+                    const red = document.getElementById('red');
+                    red.style.width = loss + "%";
+                    red.innerHTML = loss.toFixed(2)+"%";
+                }
+                }
+
+
+                }
+
+            function getTeamName(team, val) {
+
+                let a = document.getElementById(team);
+                for (let i = 0; i < a.length; i++) {
+                    let option = a.options[i];
+                    if (option.value == val) {
+                        return option.text;
+                    }
+                }
+                }
+
+            window.onload = loadData;
+        </script>
+        <style>
+            #body {
+                font-style: white;
+                align-items: center;
+            }
+            table {
+                margin-left: auto;
+                margin-right: auto;
+                width: 65%;
+                border: 1px solid white;
+                border-collapse: collapse;
+            }
+            th {
+                text-align: center;
+                color: rgb(255, 255, 255);
+                font-size: 40px;
+                background-color:rgb(35, 16, 208);
+                
+            }
+            tr {
+                color: white;
+                padding: 5px;
+                margin-top: 10px;
+                background-color:rgb(29, 29, 29);
+                border: 1px solid white;
+                font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                font: bold;
+                
+                &:nth-of-type(odd) {
+		            background: rgb(72, 72, 72);
+                    border: 1px solid white;
+	            }
+            }
+            td {
+                font-size: 20px;
+                text-align: center;
+                padding: 10px;
+            }            
+            .content-box {
+                color: white;
+                margin-left: auto;
+                margin-right: auto;
+                background-color: black;
+                width: 65%;
+                padding: 5px;
+                border: 2px;
+                border-style: solid;
+                
+            }
+            .label1 {
+                color: white;
+                background-color: black;
+                border:3px solid white;
+                font-size: 20px;
+                font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                width: 48%;
+                float: left;
+                padding: 5px;
+            }
+            .label2 {
+                color: white;
+                background-color: black;
+                border:3px solid white;
+                font-size: 20px;
+                font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                width: 48%;
+                float: right;
+                padding: 5px;
+            }
+            .button-24 {
+            background: rgb(35, 16, 208);
+            border: 1px solid rgb(0, 0, 0);
+            border-radius: 6px;
+            box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+            box-sizing: border-box;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            display: inline-block;
+            font-family: nunito,roboto,proxima-nova,"proxima nova",sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 16px;
+            min-height: 40px;
+            outline: 0;
+            padding: 12px 14px;
+            text-align: center;
+            text-rendering: geometricprecision;
+            text-transform: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            vertical-align: middle;
+            }
+
+            .button-24:hover,
+            .button-24:active {
+            background-color: white;
+            background-position: 0 0;
+            color: rgb(35, 16, 208);
+            border: 1px solid white;
+            border-radius: 6px;
+            }
+
+            .button-24:active {
+            opacity: .5;
+            }
+            img {
+                margin-right: 150px;
+                margin-left: 150px;
+                height: 150px;
+                width: 150px;
+            }
+            .response {
+                display: flex;
+                position: relative;
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;               
+            }
+        </style>
+    </head>
+    <body style="background-color: black;">
+        <h1 style="color: white; text-align: center; font-size: 60px;">Test Out Our Matchup Predictor</h1>
+        <center>
+        <div class="content-box" id="main">
+            <p style="text-align: center; font-style: italic; font-size: 20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">Choose two teams and hit PREDICT to see the chance of each team winning</p>
+            <form style="padding: 10px" name="predictionForm" onsubmit="predictor(); return false">
+                <div class="label1">
+                    <label for="teamOne">Team #1:</label>
+                    <select name="teamOne" id="team1" style="color: black; font-size: 20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
+                    </select>
+                </div>
+                <div class="label2">
+                    <label for="teamTwo">Team #2:</label>
+                    <select name="teamTwo" id="team2" style="color: black; font-size: 20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
+                    </select>
+                </div>
+                <br>
+                <br>
+                <br>
+                <input type="submit" class="button-24" value="PREDICT"> 
+                <br>
+                <br>
+                <p id="placeholder">
+                   
+                </p>
+                <div class="progress">
+                    <div id="green" class="progress-bar progress-bar-success" role="progressbar"></div>
+                    <div id="yellow" class="progress-bar progress-bar-warning" role="progressbar"></div>
+                    <div id="red" class="progress-bar progress-bar-danger" role="progressbar"></div>
+                </div>
+                <div class="response">
+                    <h4 id="Winner"></h4>
+                    <h4 id="Draw"></h4>
+                    <h4 id="Loser"></h4>
+                </div>
+                
+        </div>
+        </center>
+        <hr>
+        <h1 style="color: white; text-align: center; font-size: 50px;">Power Rankings for The English Premier League</h1>
+        <br>
+        <p style="color: white; font-style: italic; text-align: center; font-size: 15px;">The DSA analytics team presents EPL Power Rankings. These rankings incorporate the results of all head-to-head matches played during the 2024 season.</p>
+        <br>
+    </body>
+</html>
